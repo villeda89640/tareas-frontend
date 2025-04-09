@@ -1,23 +1,62 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  const [tareas, setTareas] = useState([]);
+  const [nuevaTarea, setNuevaTarea] = useState('');
+
+  // Leer tareas del backend
+  useEffect(() => {
+    fetch('http://localhost:5000/api/tareas')
+      .then(res => res.json())
+      .then(data => setTareas(data));
+  }, []);
+
+  // Crear tarea
+  const agregarTarea = async () => {
+    if (nuevaTarea.trim()) {  // Asegúrate de que no esté vacío
+      const res = await fetch('http://localhost:5000/api/tareas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: nuevaTarea }),
+      });
+      const data = await res.json();
+      setTareas([...tareas, data]);
+      setNuevaTarea('');
+    }
+  };
+
+  // Eliminar tarea
+  const eliminarTarea = async (id) => {
+    await fetch(`http://localhost:5000/api/tareas/${id}`, { method: 'DELETE' });
+    setTareas(tareas.filter(t => t._id !== id));
+  };
+
+  // Manejar el evento "Enter"
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      agregarTarea();  // Agregar la tarea cuando presionas Enter
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Mis Tareas</h1>
+      <input
+        value={nuevaTarea}
+        onChange={(e) => setNuevaTarea(e.target.value)}
+        onKeyDown={handleKeyDown}  // Detecta el evento "Enter"
+        placeholder="Escribe una tarea y presiona Enter"
+      />
+      <button onClick={agregarTarea}>Agregar</button>
+      <ul>
+        {tareas.map((tarea) => (
+          <li key={tarea._id}>
+            {tarea.texto}
+            <button onClick={() => eliminarTarea(tarea._id)}>Eliminar</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
