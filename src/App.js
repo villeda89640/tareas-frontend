@@ -7,7 +7,7 @@ function App() {
 
   // Leer tareas del backend
   useEffect(() => {
-    fetch('http://localhost:5000/api/tareas')
+    fetch('https://tareas-backend-8gi1.onrender.com/api/tareas')
       .then(res => res.json())
       .then(data => setTareas(data));
   }, []);
@@ -15,7 +15,7 @@ function App() {
   // Crear tarea
   const agregarTarea = async () => {
     if (nuevaTarea.trim()) {  // Asegúrate de que no esté vacío
-      const res = await fetch('http://localhost:5000/api/tareas', {
+      const res = await fetch('https://tareas-backend-8gi1.onrender.com/api/tareas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ texto: nuevaTarea }),
@@ -28,7 +28,7 @@ function App() {
 
   // Eliminar tarea
   const eliminarTarea = async (id) => {
-    await fetch(`http://localhost:5000/api/tareas/${id}`, { method: 'DELETE' });
+    await fetch(`https://tareas-backend-8gi1.onrender.com/api/tareas/${id}`, { method: 'DELETE' });
     setTareas(tareas.filter(t => t._id !== id));
   };
 
